@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;">
+<title>MetalDeck SR-79 — مسجّل الشاشة المكتبي</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="device">
+  <!-- مسامير الزوايا -->
+  <span class="screw" style="top:9px;left:9px;--rot:24deg"></span>
+  <span class="screw" style="top:9px;right:9px;--rot:-52deg"></span>
+  <span class="screw" style="bottom:9px;left:9px;--rot:80deg"></span>
+  <span class="screw" style="bottom:9px;right:9px;--rot:-15deg"></span>
+
+  <!-- شريط العنوان -->
+  <header id="titlebar">
+    <div class="brand">
+      <div class="badge">◉</div>
+      <div class="brand-text">
+        <h1>METALDECK <span>SR-79</span></h1>
+        <p dir="rtl">مسجّل الشاشة المكتبي — معالجة محلية 100٪</p>
+      </div>
+    </div>
+    <div class="tb-spec engraved">100% OFFLINE · LOCAL STORAGE ONLY</div>
+    <div class="tb-led">
+      <span class="led green on"></span><label class="engraved">PWR</label>
+    </div>
+    <div class="winbtns">
+      <button id="btnMin" title="تصغير">–</button>
+      <button id="btnMax" title="تكبير">□</button>
+      <button id="btnClose" title="إغلاق">✕</button>
+    </div>
+  </header>
+
+  <!-- لوحة الجهاز -->
+  <main id="deck">
+
+    <!-- ══ العمود الأيسر: الشاشة + أزرار النقل ══ -->
+    <section id="monitor-col">
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">MONITOR</span>
+          <span class="sub" dir="rtl">شاشة المعاينة</span>
+          <span class="head-right"><span class="led red" id="ledRec"></span><label class="engraved">REC</label></span>
+        </div>
+        <div class="crt-wrap">
+          <div class="crt" id="crt">
+            <video id="preview" muted autoplay playsinline></video>
+            <div class="static-layer" id="staticLayer"></div>
+            <div class="rollbar"></div>
+            <div class="osd">
+              <span id="osdStatus" class="dim">NO SIGNAL</span>
+              <span id="osdSrc"></span>
+              <span id="osdClock"></span>
+            </div>
+            <div class="scanlines"></div>
+            <div class="vignette"></div>
+            <div class="snap-flash" id="snapFlash"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">TRANSPORT</span>
+          <span class="sub" dir="rtl">أزرار التحكم</span>
+        </div>
+        <div class="transport">
+          <button id="btnPause" class="key" title="إيقاف مؤقت / استئناف">
+            <span class="key-top">❚❚<small>PAUSE</small></span>
+          </button>
+          <button id="btnStop" class="key disabled" title="إيقاف نهائي">
+            <span class="key-top">■<small>STOP</small></span>
+          </button>
+          <div class="rec-wrap">
+            <span class="rec-glow"></span>
+            <button id="btnRec" title="بدء / إيقاف التسجيل"><span class="rec-core"></span></button>
+            <span class="engraved">REC</span>
+          </div>
+          <button id="btnSnap" class="key" title="لقطة شاشة">
+            <span class="key-top">✦<small>SNAP</small></span>
+          </button>
+          <div class="led-cluster">
+            <div><span class="led red"   id="ledRec2"></span><label>REC</label></div>
+            <div><span class="led amber" id="ledPause"></span><label>PAUSE</label></div>
+            <div><span class="led green" id="ledReady"></span><label>READY</label></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ العمود الأيمن: الرف التحكمي ══ -->
+    <section id="rack">
+
+      <!-- العداد الزمني -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">ELAPSED</span>
+          <span class="sub" dir="rtl">الزمن المنقضي</span>
+        </div>
+        <div class="seg-display">
+          <span class="ghost">88:88:88</span>
+          <span id="timer">00:00:00</span>
+        </div>
+        <div class="status-line" dir="rtl"><span id="statusText">جاهز للتسجيل</span></div>
+        <div class="vu" id="vu"></div>
+        <div class="vu-label engraved">AUDIO LEVEL ▸ VU</div>
+      </div>
+
+      <!-- مصدر الالتقاط -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">SOURCE</span>
+          <span class="sub" dir="rtl">مصدر الالتقاط</span>
+        </div>
+        <div class="switch-row">
+          <button class="sw-opt engraved" id="optScreen">FULL SCREEN</button>
+          <div class="track" id="modeTrack"><span class="lever"></span></div>
+          <button class="sw-opt engraved" id="optWindow">WINDOW</button>
+        </div>
+        <button id="btnTune" class="key small wide disabled">
+          <span class="key-top">TUNE ⌖<small dir="rtl">اختيار نافذة التطبيق</small></span>
+        </button>
+        <div class="mini-lcd" id="srcName">FULL SCREEN</div>
+        <div class="switch-row tiny-row">
+          <span class="engraved">FORMAT</span>
+          <button class="sw-opt engraved" id="optWebm">WEBM</button>
+          <div class="track tiny" id="fmtTrack"><span class="lever"></span></div>
+          <button class="sw-opt engraved" id="optMp4">MP4</button>
+        </div>
+      </div>
+
+      <!-- مزج الصوت -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">AUDIO SRC</span>
+          <span class="sub" dir="rtl">مصدر الصوت — قابل للتبديل أثناء التسجيل</span>
+        </div>
+        <div class="knob-zone">
+          <div class="knob" id="audioKnob" tabindex="0" role="button" title="قرص مصدر الصوت">
+            <span class="cap" id="knobCap"><i class="pointer"></i></span>
+          </div>
+          <div class="a-labels" id="alabels">
+            <button data-v="sys"><span class="led green"></span><b>SYS</b><small dir="rtl">صوت النظام فقط</small></button>
+            <button data-v="mic"><span class="led green"></span><b>MIC</b><small dir="rtl">المايكروفون فقط</small></button>
+            <button data-v="mix"><span class="led amber"></span><b>MIX</b><small dir="rtl">دمج المصدرين</small></button>
+            <button data-v="mute"><span class="led red"></span><b>MUTE</b><small dir="rtl">بدون صوت</small></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- الاختصارات العالمية -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">HOTKEYS</span>
+          <span class="sub" dir="rtl">اختصارات عامة — انقر ثم اضغط التركيب الجديد</span>
+        </div>
+        <ul class="hk-list" id="hotkeys"></ul>
+      </div>
+
+      <!-- الملفات -->
+      <div class="panel">
+        <div class="panel-head">
+          <span class="engraved">FILES</span>
+          <span class="sub" dir="rtl">التخزين المحلي</span>
+        </div>
+        <div class="mini-lcd path" id="dirLabel">…</div>
+        <button id="btnFolder" class="key wide">
+          <span class="key-top">⌂ OPEN FOLDER<small dir="rtl">فتح مجلد الحفظ</small></span>
+        </button>
+        <div class="counter"><span class="engraved">SESSION COUNT</span><span id="counter">000</span></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- شريط السجل -->
+  <footer id="logbar">
+    <span class="led green tiny on" id="logLed"></span>
+    <span id="logText" dir="rtl">جارٍ إقلاع النظام…</span>
+    <span class="serial engraved">SN 0079-MD · MADE FOR WINDOWS</span>
+  </footer>
+</div>
+
+<!-- نافذة اختيار التطبيق -->
+<div id="picker" class="modal hidden">
+  <div class="modal-box panel">
+    <div class="panel-head">
+      <span class="engraved">WINDOW TUNER</span>
+      <span class="sub" dir="rtl">اختر نافذة التطبيق المراد تسجيلها</span>
+      <button id="pickerClose" class="modal-x">✕</button>
+    </div>
+    <div id="pickerGrid"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

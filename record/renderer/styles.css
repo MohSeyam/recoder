@@ -1,0 +1,415 @@
+/* ════════════════════════════════════════════════════════════
+   MetalDeck SR-79 — النمط المعدني الكلاسيكي (Retro & Metal)
+   ════════════════════════════════════════════════════════════ */
+:root{
+  --metal-hi:#565b63; --metal:#33363c; --metal-lo:#212327;
+  --groove:#101114; --edge:#0b0c0e;
+  --silver:#c9ccd1; --label:#9aa0a8; --label-dim:#6f757d;
+  --red:#ff3b2c; --amber:#ffb43a; --green:#52f57d;
+  --lcd:#6cf58a; --seg:#ff5a45;
+}
+*{ box-sizing:border-box; user-select:none; -webkit-user-select:none; margin:0; padding:0; }
+.mini-lcd,#logText,#dirLabel,.nm{ user-select:text; }
+
+body{
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:18px; overflow:auto; color:var(--silver);
+  font-family:"Segoe UI", Tahoma, Arial, sans-serif;
+  background:
+    radial-gradient(1100px 650px at 50% -12%, #2e3136 0%, transparent 60%),
+    radial-gradient(900px 500px at 88% 112%, #23262a 0%, transparent 55%),
+    #141518;
+}
+:focus-visible{ outline:2px solid var(--amber); outline-offset:2px; border-radius:4px; }
+.hidden{ display:none !important; }
+
+/* ─── هيكل الجهاز المعدني ─── */
+#device{
+  width:min(1080px,100%); position:relative;
+  border-radius:16px; padding:0 20px 14px;
+  border:1px solid var(--edge);
+  background:
+    repeating-linear-gradient(0deg, rgba(255,255,255,.022) 0 1px, transparent 1px 3px),
+    linear-gradient(175deg,#43474d 0%,#2c2f34 22%,#24262b 60%,#1c1e22 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.22), inset 0 -2px 0 rgba(0,0,0,.55),
+    inset 2px 0 0 rgba(255,255,255,.05),
+    0 26px 60px rgba(0,0,0,.65), 0 4px 14px rgba(0,0,0,.5);
+}
+
+/* المسامير */
+.screw{
+  position:absolute; width:15px; height:15px; border-radius:50%; z-index:5;
+  background:radial-gradient(circle at 35% 30%, #cfd4da, #8a8f96 45%, #565b62 72%, #2b2e33);
+  box-shadow:inset 0 -1px 2px rgba(0,0,0,.85), 0 1px 1px rgba(255,255,255,.15);
+}
+.screw::after{
+  content:''; position:absolute; left:16%; right:16%; top:50%; height:2px; margin-top:-1px;
+  background:#22252a; border-radius:1px; transform:rotate(var(--rot,25deg));
+  box-shadow:0 1px 0 rgba(255,255,255,.25);
+}
+
+/* نص محفور على المعدن */
+.engraved{
+  font-size:10px; font-weight:800; letter-spacing:.22em; text-transform:uppercase;
+  color:var(--label); font-family:"Arial Narrow", Arial, sans-serif;
+  text-shadow:0 -1px 0 rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.10);
+}
+.sub{ font-size:11px; color:var(--label-dim); margin-inline-start:auto; }
+
+/* ─── شريط العنوان ─── */
+#titlebar{
+  display:flex; align-items:center; gap:16px; height:58px;
+  -webkit-app-region:drag;
+  border-bottom:1px solid rgba(0,0,0,.55);
+  box-shadow:0 1px 0 rgba(255,255,255,.07);
+}
+.brand{ display:flex; align-items:center; gap:11px; }
+.badge{
+  width:34px; height:34px; border-radius:50%; display:grid; place-items:center;
+  color:var(--red); font-size:15px;
+  background:radial-gradient(circle at 50% 38%, #3c4046, #1d1f23 75%);
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.7), inset 0 -1px 0 rgba(255,255,255,.12),
+             0 1px 0 rgba(255,255,255,.1), 0 0 10px rgba(255,59,44,.25);
+}
+.brand-text h1{ font-size:17px; letter-spacing:.16em; color:#dfe2e6; font-weight:800;
+  text-shadow:0 -1px 0 rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.12); }
+.brand-text h1 span{ color:var(--amber); }
+.brand-text p{ font-size:10.5px; color:var(--label-dim); margin-top:1px; }
+.tb-spec{ margin-inline-start:auto; }
+.tb-led{ display:flex; align-items:center; gap:6px; }
+.tb-led label{ font-size:9px; }
+.winbtns{ display:flex; gap:8px; -webkit-app-region:no-drag; }
+.winbtns button{
+  width:32px; height:23px; border-radius:5px; cursor:pointer; font-size:12px;
+  border:1px solid var(--groove); color:#c8ccd2;
+  background:linear-gradient(180deg,#4a4e55,#2e3136);
+  box-shadow:0 2px 0 var(--groove), inset 0 1px 0 rgba(255,255,255,.25);
+  transition:.08s;
+}
+.winbtns button:active{ transform:translateY(2px); box-shadow:0 0 0 var(--groove); }
+.winbtns #btnClose:hover{ background:linear-gradient(180deg,#e05545,#a72a1d); color:#fff; }
+
+/* ─── شبكة اللوحة ─── */
+#deck{
+  display:grid; grid-template-columns:1.55fr 1fr; gap:14px;
+  padding-top:16px; direction:ltr;
+}
+#monitor-col,#rack{ display:flex; flex-direction:column; gap:14px; min-width:0; }
+
+/* ─── الألواح ─── */
+.panel{
+  position:relative; border-radius:10px; padding:12px 14px 14px;
+  border:1px solid #131417;
+  background:linear-gradient(180deg,#35383e,#26292e 55%,#202226);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.14), inset 0 -1px 0 rgba(0,0,0,.5),
+             0 6px 14px rgba(0,0,0,.35);
+}
+.panel-head{
+  display:flex; align-items:baseline; gap:10px;
+  padding-bottom:8px; margin-bottom:12px;
+  border-bottom:1px solid rgba(0,0,0,.45);
+  box-shadow:0 1px 0 rgba(255,255,255,.06);
+}
+.head-right{ margin-left:auto; display:flex; align-items:center; gap:6px; }
+
+/* ─── شاشة CRT ─── */
+.crt-wrap{
+  padding:12px; border-radius:18px;
+  background:linear-gradient(180deg,#191b1e,#0e0f11);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.08);
+}
+.crt{
+  position:relative; aspect-ratio:16/9; overflow:hidden;
+  background:#050607; border-radius:11px; border:1px solid #000;
+  box-shadow:inset 0 0 36px rgba(0,0,0,.95);
+}
+#preview{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; background:#000; }
+.static-layer{
+  position:absolute; inset:0; opacity:.55; background-size:220% 220%;
+  animation:staticJitter .45s steps(3) infinite; transition:opacity .45s;
+}
+.crt.live .static-layer{ opacity:0; }
+@keyframes staticJitter{
+  0%{background-position:0 0} 33%{background-position:60% 35%}
+  66%{background-position:25% 80%} 100%{background-position:90% 10%}
+}
+.rollbar{
+  position:absolute; left:0; right:0; height:64px; top:-70px; pointer-events:none;
+  background:linear-gradient(180deg,transparent,rgba(255,255,255,.05),transparent);
+  animation:roll 7s linear infinite;
+}
+@keyframes roll{ to{ transform:translateY(calc(100vh)); top:0; } }
+.scanlines{
+  position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+.vignette{
+  position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:radial-gradient(ellipse at center, transparent 58%, rgba(0,0,0,.55) 100%);
+}
+.snap-flash{ position:absolute; inset:0; background:#fff; opacity:0; pointer-events:none; z-index:4; }
+.snap-flash.go{ animation:flash .38s ease-out; }
+@keyframes flash{ 0%{opacity:.95} 100%{opacity:0} }
+
+/* OSD */
+.osd{ position:absolute; inset:0; z-index:3; pointer-events:none;
+  font-family:Consolas, monospace; font-size:12px; letter-spacing:.12em; }
+.osd #osdStatus{ position:absolute; top:10px; left:12px; }
+.osd #osdSrc{ position:absolute; bottom:10px; left:12px; font-size:10px; color:#7f8894; }
+.osd #osdClock{ position:absolute; bottom:10px; right:12px; color:#5f6873; }
+.osd .dim{ color:#5f6873; }
+.osd .red{ color:#ff5140; text-shadow:0 0 8px rgba(255,60,40,.9); animation:blinkTxt 1s steps(2,start) infinite; }
+.osd .amber{ color:var(--amber); text-shadow:0 0 8px rgba(255,180,58,.8); }
+@keyframes blinkTxt{ 50%{ opacity:.15; } }
+
+/* ─── أزرار النقل الميكانيكية ─── */
+.transport{ display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.key{ border:none; background:transparent; cursor:pointer; padding:0; }
+.key .key-top{
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+  min-width:80px; padding:13px 12px; border-radius:9px;
+  font-size:16px; font-weight:800; letter-spacing:.08em; color:#d7dade;
+  text-shadow:0 -1px 0 rgba(0,0,0,.7);
+  border:1px solid #121316; border-top-color:#6a7078;
+  background:linear-gradient(180deg,var(--metal-hi),#34383e 48%,#272a2f);
+  box-shadow:0 6px 0 var(--groove), 0 10px 16px rgba(0,0,0,.55),
+             inset 0 1px 0 rgba(255,255,255,.28);
+  transition:transform .07s, box-shadow .07s;
+}
+.key .key-top small{ font-size:9px; letter-spacing:.2em; color:#8b9097; font-weight:700; }
+.key:active .key-top, .key.pressed .key-top{
+  transform:translateY(5px);
+  box-shadow:0 1px 0 var(--groove), 0 3px 6px rgba(0,0,0,.5),
+             inset 0 2px 6px rgba(0,0,0,.45);
+}
+.key.disabled .key-top{ opacity:.45; }
+.key.wide{ width:100%; margin-top:10px; }
+.key.small .key-top{ min-width:0; width:100%; padding:10px; margin-top:2px; }
+
+/* زر REC الأحمر الدائري */
+.rec-wrap{ display:flex; flex-direction:column; align-items:center; gap:6px; position:relative; padding:0 8px; }
+.rec-glow{
+  position:absolute; top:50%; left:50%; width:120px; height:120px;
+  transform:translate(-50%,-58%); border-radius:50%; pointer-events:none;
+  background:radial-gradient(circle, rgba(255,50,30,.5), transparent 70%);
+  opacity:0; transition:.35s;
+}
+.rec-wrap:has(#btnRec.armed) .rec-glow{ opacity:1; animation:glowpulse 1.2s ease-in-out infinite; }
+@keyframes glowpulse{ 50%{ transform:translate(-50%,-58%) scale(1.18); opacity:.65; } }
+#btnRec{
+  width:86px; height:86px; border-radius:50%; border:none; cursor:pointer; position:relative;
+  background:radial-gradient(circle at 50% 44%, #ff6a55 0%, #e03423 42%, #9c130b 78%, #7a0d06 100%);
+  box-shadow:
+    0 0 0 5px #1a1c1f, 0 0 0 7px #43474d, 0 0 0 8px var(--groove),
+    0 9px 16px rgba(0,0,0,.55),
+    inset 0 -7px 12px rgba(0,0,0,.45), inset 0 5px 7px rgba(255,255,255,.35);
+  transition:transform .09s, box-shadow .09s;
+}
+#btnRec::after{
+  content:''; position:absolute; top:14%; left:22%; width:34%; height:20%;
+  border-radius:50%; background:radial-gradient(ellipse, rgba(255,255,255,.55), transparent 70%);
+}
+#btnRec:active, #btnRec.armed{ transform:translateY(4px);
+  box-shadow:
+    0 0 0 5px #1a1c1f, 0 0 0 7px #43474d, 0 0 0 8px var(--groove),
+    0 3px 8px rgba(0,0,0,.55),
+    inset 0 -3px 8px rgba(0,0,0,.55), inset 0 3px 5px rgba(255,255,255,.25);
+}
+
+/* عناقيد المؤشرات */
+.led-cluster{ display:flex; flex-direction:column; gap:7px; padding-left:6px;
+  border-left:1px solid rgba(0,0,0,.4); box-shadow:-1px 0 0 rgba(255,255,255,.05); }
+.led-cluster div{ display:flex; align-items:center; gap:7px; }
+.led-cluster label{ font-size:8.5px; letter-spacing:.18em; color:var(--label-dim); font-weight:700; }
+
+/* ─── مصابيح LED ─── */
+.led{
+  width:11px; height:11px; border-radius:50%; display:inline-block; flex:none;
+  background:#2a2124; box-shadow:inset 0 1px 3px rgba(0,0,0,.9), 0 1px 0 rgba(255,255,255,.08);
+  transition:.15s;
+}
+.led.tiny{ width:8px; height:8px; }
+.led.green.on{ background:var(--green); box-shadow:0 0 8px var(--green), 0 0 20px rgba(82,245,125,.55), inset 0 0 2px #fff; }
+.led.red.on{   background:var(--red);   box-shadow:0 0 8px var(--red),   0 0 20px rgba(255,59,44,.6); }
+.led.amber.on{ background:var(--amber); box-shadow:0 0 8px var(--amber), 0 0 18px rgba(255,180,58,.55); }
+.led.blink{ animation:ledblink .9s steps(2,start) infinite; }
+@keyframes ledblink{ 50%{ background:#2a2124; box-shadow:inset 0 1px 3px rgba(0,0,0,.9); } }
+
+/* ─── العداد الرقمي (7-Segment) ─── */
+.seg-display{
+  position:relative; text-align:center; direction:ltr;
+  font-family:Consolas,"Courier New",monospace; font-size:44px; font-weight:700; letter-spacing:.06em;
+  padding:10px 14px; border-radius:8px; border:1px solid #000;
+  background:linear-gradient(180deg,#0d0505,#1a0b0a 60%,#120707);
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.9), inset 0 0 26px rgba(255,40,20,.06),
+             0 1px 0 rgba(255,255,255,.07);
+}
+.seg-display .ghost{ position:absolute; inset:10px 14px; color:rgba(255,90,70,.07); }
+#timer{ position:relative; color:var(--seg);
+  text-shadow:0 0 6px rgba(255,70,45,.95), 0 0 26px rgba(255,70,45,.45); }
+#timer.blink{ animation:blinkTxt 1s steps(2,start) infinite; }
+.status-line{
+  margin-top:9px; padding:6px 10px; border-radius:6px; text-align:center;
+  font-size:13px; color:var(--lcd);
+  background:linear-gradient(180deg,#0f1a12,#12241a 60%,#0d1811);
+  border:1px solid #000; box-shadow:inset 0 2px 6px rgba(0,0,0,.85);
+  text-shadow:0 0 7px rgba(108,245,138,.55);
+}
+
+/* ─── مؤشر مستوى الصوت VU ─── */
+.vu{ display:flex; gap:4px; height:16px; margin-top:11px; padding:5px 7px; border-radius:6px;
+  background:#101215; box-shadow:inset 0 2px 6px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.06); }
+.vu i{ flex:1; border-radius:2px; background:#20262b;
+  box-shadow:inset 0 1px 2px rgba(0,0,0,.8); transition:background .05s, box-shadow .05s; }
+.vu i:nth-child(-n+8){ --c:#3fe36b; }
+.vu i:nth-child(n+9):nth-child(-n+11){ --c:var(--amber); }
+.vu i:nth-child(n+12){ --c:#ff4436; }
+.vu i.on{ background:var(--c); box-shadow:0 0 8px var(--c), inset 0 0 2px rgba(255,255,255,.5); }
+.vu-label{ margin-top:7px; text-align:center; font-size:8.5px; }
+
+/* ─── مفاتيح التبديل المعدنية ─── */
+.switch-row{ display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:10px; }
+.sw-opt{ background:none; border:none; cursor:pointer; font-size:10px; padding:4px 2px; transition:.15s; opacity:.55; }
+.sw-opt:hover{ opacity:.85; }
+.sw-opt.active{ color:#e8d9b8; opacity:1; text-shadow:0 0 8px rgba(255,200,120,.35); }
+.track{
+  position:relative; width:72px; height:26px; border-radius:20px; cursor:pointer; flex:none;
+  background:linear-gradient(180deg,#0e0f11,#1b1d20);
+  box-shadow:inset 0 2px 5px rgba(0,0,0,.85), inset 0 -1px 0 rgba(255,255,255,.06);
+}
+.track .lever{
+  position:absolute; top:3px; left:3px; width:31px; height:20px; border-radius:12px;
+  background:linear-gradient(180deg,#c8cdd3,#8d939b 45%,#6a7078);
+  box-shadow:0 2px 4px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.75);
+  transition:left .18s cubic-bezier(.55,-.3,.45,1.4);
+}
+.track.right .lever{ left:calc(100% - 34px); }
+.track.tiny{ width:52px; height:20px; }
+.track.tiny .lever{ width:22px; height:14px; }
+.track.tiny.right .lever{ left:calc(100% - 25px); }
+.tiny-row{ margin-top:12px; margin-bottom:0; }
+
+/* ─── شاشات LCD الصغيرة ─── */
+.mini-lcd{
+  margin-top:10px; padding:7px 10px; border-radius:6px; border:1px solid #000;
+  direction:ltr; font-family:Consolas,monospace; font-size:12px; color:var(--lcd);
+  background:linear-gradient(180deg,#0f1a12,#12241a 60%,#0d1811);
+  text-shadow:0 0 6px rgba(108,245,138,.6);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.85), 0 1px 0 rgba(255,255,255,.07);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.mini-lcd.path{ direction:ltr; font-size:11px; margin-top:0; }
+
+/* ─── القرص الدوار (مصدر الصوت) ─── */
+.knob-zone{ display:flex; align-items:center; gap:16px; }
+.knob{
+  width:94px; height:94px; border-radius:50%; position:relative; cursor:pointer; flex:none;
+  background:radial-gradient(circle at 50% 40%, #575c64, #33363c 60%, #26282d);
+  box-shadow:0 8px 14px rgba(0,0,0,.55), 0 0 0 5px #1a1c1f, 0 0 0 6px rgba(255,255,255,.05),
+             inset 0 2px 3px rgba(255,255,255,.25), inset 0 -6px 10px rgba(0,0,0,.5);
+}
+.knob .cap{
+  position:absolute; inset:9px; border-radius:50%;
+  transform:rotate(var(--rot,-54deg));
+  transition:transform .28s cubic-bezier(.34,1.5,.5,1);
+  background:conic-gradient(from 210deg, rgba(255,255,255,.14), rgba(0,0,0,.25) 20%,
+    rgba(255,255,255,.14) 38%, rgba(0,0,0,.25) 58%, rgba(255,255,255,.14) 78%, rgba(0,0,0,.25));
+  box-shadow:inset 0 1px 2px rgba(255,255,255,.3), inset 0 -3px 6px rgba(0,0,0,.5);
+}
+.knob:active .cap{ filter:brightness(1.08); }
+.knob .pointer{
+  position:absolute; top:5px; left:50%; width:5px; height:21px; margin-left:-2.5px; border-radius:3px;
+  background:linear-gradient(180deg,#ffe0b0,#ff9d3c);
+  box-shadow:0 0 9px rgba(255,157,60,.85);
+}
+.a-labels{ display:grid; grid-template-columns:1fr 1fr; gap:7px; flex:1; }
+.a-labels button{
+  display:flex; align-items:center; gap:7px; padding:7px 9px; border-radius:7px; cursor:pointer;
+  border:1px solid var(--groove); background:linear-gradient(180deg,#24262b,#1b1d21);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07); color:var(--label-dim); transition:.15s;
+}
+.a-labels button b{ font-size:11px; letter-spacing:.12em; color:#aeb4bb; }
+.a-labels button small{ font-size:9.5px; margin-inline-start:auto; }
+.a-labels button.active{ border-color:rgba(255,180,58,.4); background:linear-gradient(180deg,#2c2f34,#22252a); }
+.a-labels button.active b{ color:#ffd9a0; text-shadow:0 0 8px rgba(255,190,110,.4); }
+
+/* ─── الاختصارات ─── */
+.hk-list{ list-style:none; display:flex; flex-direction:column; gap:7px; }
+.hk-list li{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  padding:7px 10px; border-radius:7px;
+  background:linear-gradient(180deg,#24262b,#1b1d21);
+  border:1px solid var(--groove); box-shadow:inset 0 1px 0 rgba(255,255,255,.07);
+}
+.hk-name{ font-size:12px; color:#aeb4bb; }
+.combo{
+  direction:ltr; font-family:Consolas,monospace; font-size:12px; color:#ffd9a0;
+  background:#0e0d0b; border:1px solid #000; border-radius:4px; padding:4px 10px;
+  cursor:pointer; min-width:112px; text-align:center;
+  box-shadow:inset 0 2px 4px rgba(0,0,0,.8);
+  text-shadow:0 0 6px rgba(255,190,110,.5);
+}
+.combo.listening{ color:#ff5a45; animation:blinkTxt .8s steps(2,start) infinite; }
+
+/* ─── الملفات ─── */
+.counter{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:10px; padding:7px 11px; border-radius:6px; direction:ltr;
+  background:#0e0f11; box-shadow:inset 0 2px 5px rgba(0,0,0,.85);
+  font-family:Consolas,monospace; font-size:14px; color:#ffd9a0;
+  text-shadow:0 0 6px rgba(255,190,110,.45);
+}
+.counter .engraved{ font-size:9px; }
+
+/* ─── شريط السجل ─── */
+#logbar{
+  margin-top:14px; display:flex; gap:10px; align-items:center;
+  padding:9px 13px; border-radius:8px; border:1px solid var(--edge);
+  background:linear-gradient(180deg,#17181b,#101114);
+  box-shadow:inset 0 2px 6px rgba(0,0,0,.7), 0 1px 0 rgba(255,255,255,.06);
+  font-size:12px; color:#9aa0a8;
+}
+#logText{ flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.serial{ font-size:8.5px; }
+
+/* ─── نافذة اختيار النافذة ─── */
+.modal{
+  position:fixed; inset:0; z-index:60; display:flex; align-items:center; justify-content:center;
+  background:rgba(8,9,11,.72); backdrop-filter:blur(4px);
+  animation:fadein .18s ease-out;
+}
+@keyframes fadein{ from{ opacity:0; } }
+.modal-box{ width:min(780px,92vw); max-height:82vh; overflow:auto; padding-bottom:16px; }
+.modal-x{
+  margin-left:auto; width:26px; height:26px; border-radius:6px; cursor:pointer;
+  border:1px solid var(--groove); color:#c8ccd2; background:linear-gradient(180deg,#4a4e55,#2e3136);
+  box-shadow:0 2px 0 var(--groove);
+}
+.modal-x:active{ transform:translateY(2px); box-shadow:none; }
+#pickerGrid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(172px,1fr)); gap:10px; }
+.win-card{
+  padding:8px; border-radius:8px; cursor:pointer; transition:.15s;
+  background:linear-gradient(180deg,#2c2f34,#212428);
+  border:1px solid #131417; box-shadow:0 3px 8px rgba(0,0,0,.4);
+}
+.win-card:hover{
+  transform:translateY(-3px); border-color:rgba(255,176,58,.4);
+  box-shadow:0 8px 18px rgba(0,0,0,.55), 0 0 0 1px rgba(255,176,58,.25);
+}
+.win-card img{
+  width:100%; aspect-ratio:16/10; object-fit:cover; border-radius:5px; display:block;
+  background:#0a0b0c; filter:saturate(.85) contrast(1.05);
+  box-shadow:inset 0 0 8px #000;
+}
+.win-card .nm{
+  margin-top:7px; font-size:11px; color:#b9bec5; direction:ltr; text-align:left;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.loading{ grid-column:1/-1; text-align:center; padding:26px; color:#8b9097; }
+
+/* أشرطة التمرير */
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-thumb{ background:linear-gradient(#4a4e55,#33363c); border-radius:6px; border:2px solid #14161a; }
+::-webkit-scrollbar-track{ background:#14161a; }

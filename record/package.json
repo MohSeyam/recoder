@@ -1,0 +1,12 @@
+{
+  "name": "metaldeck",
+  "version": "1.0.0",
+  "main": "metaldeck.js",
+  "scripts": { "dist": "electron-builder --win" },
+  "devDependencies": { "electron": "^31.0.0", "electron-builder": "^24.13.3" },
+  "build": {
+    "appId": "com.metaldeck.recorder",
+    "files": ["metaldeck.js"],
+    "win": { "target": "nsis" }
+  }
+}
